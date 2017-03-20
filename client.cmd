@@ -1,1 +1,1 @@
-START "Client" /D C:\Dev\dotnet\Meetup.Betting\Meetup.Betting.Client\bin\Debug Meetup.Betting.Client.exe
+START "Client" /D .\Meetup.Betting.Client\bin\Debug Meetup.Betting.Client.exe
