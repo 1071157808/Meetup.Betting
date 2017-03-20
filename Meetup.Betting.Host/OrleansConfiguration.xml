@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<OrleansConfiguration xmlns="urn:orleans">
+  <Globals>
+    <SystemStore SystemStoreType="None" DataConnectionString="http://localhost:8500" />
+    <StorageProviders>
+      <Provider Type="Orleans.StorageProviders.RedisStorage" Name="Default" RedisConnectionString="localhost, abortConnect = true" />
+    </StorageProviders>
+  </Globals>
+  <Defaults>
+    <Networking Address="" Port="9800" />
+    <ProxyingGateway Address="" Port="9888" />
+    <Tracing DefaultTraceLevel="Info" TraceToConsole="false">
+      <TraceLevelOverride LogPrefix="Application" TraceLevel="Info" />
+    </Tracing>
+  </Defaults>
+</OrleansConfiguration>

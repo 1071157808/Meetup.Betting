@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ClientConfiguration xmlns="urn:orleans">
+  <SystemStore SystemStoreType="Custom" CustomGatewayProviderAssemblyName="OrleansConsulUtils" DataConnectionString="http://localhost:8500" />
+</ClientConfiguration>
