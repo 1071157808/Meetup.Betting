@@ -12,6 +12,7 @@ namespace Meetup.Betting.Contracts.Messages
         public EventData()
         {
             Markets = new Dictionary<string, MarketData>();   
+            TeamsKeys = new string[0];
         }
 
         public string EventKey { get; set; }
@@ -68,7 +69,12 @@ namespace Meetup.Betting.Contracts.Messages
 
     [Serializable]
     public class ScoreboardData : IEquatable<ScoreboardData>
-    {   
+    {
+        public ScoreboardData()
+        {
+            ScoresByPeriod = new string[0];
+            CurrentScore = new string[0];
+        }
         public TimeSpan? CurrentTime { get; set; }
         public string[] CurrentScore { get; set; }
         public string[] ScoresByPeriod { get; set; }

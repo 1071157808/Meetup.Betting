@@ -1,8 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
-using System.Threading.Tasks;
-using Orleans.Runtime;
+using Marten;
+using Marten.Events;
+using Meetup.Betting.Actors.Persistence;
+using Meetup.Betting.Actors.Persistence.Events;
+using Microsoft.Extensions.DependencyInjection;
 using Orleans.Runtime.Configuration;
 using Orleans.Runtime.Host;
 using OrleansDashboard;
@@ -51,5 +53,32 @@ namespace Meetup.Betting.Host
         }
 
         private static OrleansHostWrapper hostWrapper;
+    }
+    public class Startup
+    {
+        public IServiceProvider ConfigureServices(IServiceCollection services)
+        {
+            var documentStore = DocumentStore.For(_ =>
+            {
+                _.DatabaseSchemaName = StoreOptions.DefaultDatabaseSchemaName;
+                _.AutoCreateSchemaObjects = AutoCreate.All;
+
+                _.Connection("host=localhost;database=meetup;password=dev_dbo;username=dev_dbo;MaxPoolSize=500");
+                
+                // _.Events.InlineProjections.AggregateStreamsWith<EventState>();
+
+                _.Events.AddEventType(typeof(MarketRegistered));
+                _.Events.AddEventType(typeof(ScoreboardChanged));
+                _.Events.AddEventType(typeof(EventInformationChanged));
+
+                //_.Events.AddEventType(typeof(MonsterSlayed));
+                //_.Events.AddEventType(typeof(MembersJoined));
+            });
+
+            services.AddSingleton<IDocumentStore>(documentStore);
+            services.AddTransient<IEventStorage, MartenEventStorage>();
+
+            return services.BuildServiceProvider();
+        }
     }
 }

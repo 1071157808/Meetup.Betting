@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Meetup.Betting.Actors.Persistence;
@@ -7,6 +8,7 @@ using Meetup.Betting.Contracts;
 using Meetup.Betting.Contracts.Messages;
 using Orleans;
 using Orleans.EventSourcing;
+using Orleans.EventSourcing.CustomStorage;
 using Orleans.Providers;
 using IMarketEvent = Meetup.Betting.Actors.Persistence.Events.IMarketEvent;
 using MarketDeactivated = Meetup.Betting.Actors.Persistence.Events.MarketDeactivated;
@@ -14,10 +16,17 @@ using MarketOddsChanged = Meetup.Betting.Actors.Persistence.Events.MarketOddsCha
 
 namespace Meetup.Betting.Actors
 {
-    [LogConsistencyProvider(ProviderName = "StateStorage")]
-    public class MarketActor : JournaledGrain<MarketState, IMarketEvent>, IMarket
+    [LogConsistencyProvider(ProviderName = "CustomStorage")]
+    public class MarketActor : JournaledGrain<MarketState, IMarketEvent>, IMarket, ICustomStorageInterface<MarketState, IMarketEvent>
     {
+        private readonly IEventStorage _eventStorage;
         private IDisposable _statisticsPublisher;
+
+        public MarketActor(IEventStorage eventStorage)
+        {
+            _eventStorage = eventStorage;
+        }
+
         public override async Task OnActivateAsync()
         {
             var parts = this.GetPrimaryKeyString().Split('|');
@@ -79,6 +88,19 @@ namespace Meetup.Betting.Actors
                     TotalAmount = State.TotalAmount,
                     BetsCount = State.BetsCount
                 });
+        }
+
+        public async Task<KeyValuePair<int, MarketState>> ReadStateFromStorage()
+        {
+            var streamId = this.GetPrimaryKeyString();
+            var state = await _eventStorage.GetStreamState<MarketState>(streamId);
+            return state;
+        }
+
+        public async Task<bool> ApplyUpdatesToStorage(IReadOnlyList<IMarketEvent> updates, int expectedversion)
+        {
+            var retult = await _eventStorage.AppendToStream(this.GetPrimaryKeyString(), updates, expectedversion);
+            return retult;
         }
     }
 }

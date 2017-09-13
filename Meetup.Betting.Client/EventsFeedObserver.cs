@@ -9,9 +9,16 @@ namespace Meetup.Betting.Client
     {
         public void OnNext(EventsFeedChangeSet changeset)
         {
-            Console.WriteLine($"Proccessing innerFeedEvent revision {changeset.Revision}");
-            var innerFeedProcessor = GrainClient.GrainFactory.GetGrain<IEventsFeedProcessor>(0);
-            innerFeedProcessor.Process(changeset).Wait();
+            try
+            {
+                Console.WriteLine($"Proccessing innerFeedEvent revision {changeset.Revision}");
+                var innerFeedProcessor = GrainClient.GrainFactory.GetGrain<IEventsFeedProcessor>(0);
+                innerFeedProcessor.Process(changeset).Wait();
+            }
+            catch (Exception e)
+            {
+                
+            }
         }
 
         public void OnError(Exception error)

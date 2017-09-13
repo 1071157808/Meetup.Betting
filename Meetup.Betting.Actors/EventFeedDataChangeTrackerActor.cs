@@ -50,37 +50,37 @@ namespace Meetup.Betting.Actors
                     }
                 }
 
-                var marketTasks = new List<Task>();
-                if (_currentSnapshot != null)
-                {
-                    foreach (var market in eventData.Markets.Values)
-                    {
-                        MarketData currentMarket;
-                        if (!_currentSnapshot.Markets.TryGetValue(market.Key, out currentMarket) || !currentMarket.Equals(market))
-                        {
-                            marketTasks.Add(
-                                GrainFactory.GetGrain<IMarket>($"{eventData.EventKey}|{market.Key}")
-                                    .ChangeOdds(market.Odds.Values.ToArray()));
-                        }
-                        _currentSnapshot.Markets.Remove(market.Key);
-                    }
-                    foreach (var currentMarket in _currentSnapshot.Markets)
-                    {
-                        marketTasks.Add(
-                            GrainFactory.GetGrain<IMarket>($"{eventData.EventKey}|{currentMarket.Key}")
-                                .Deactivate());
-                    }
-                }
-                else
-                {
-                    foreach (var market in eventData.Markets.Values)
-                    {
-                        marketTasks.Add(
-                            GrainFactory.GetGrain<IMarket>($"{eventData.EventKey}|{market.Key}")
-                                .ChangeOdds(market.Odds.Values.ToArray()));
-                    }
-                }
-                await Task.WhenAll(marketTasks);
+                //var marketTasks = new List<Task>();
+                //if (_currentSnapshot != null)
+                //{
+                //    foreach (var market in eventData.Markets.Values)
+                //    {
+                //        MarketData currentMarket;
+                //        if (!_currentSnapshot.Markets.TryGetValue(market.Key, out currentMarket) || !currentMarket.Equals(market))
+                //        {
+                //            marketTasks.Add(
+                //                GrainFactory.GetGrain<IMarket>($"{eventData.EventKey}|{market.Key}")
+                //                    .ChangeOdds(market.Odds.Values.ToArray()));
+                //        }
+                //        _currentSnapshot.Markets.Remove(market.Key);
+                //    }
+                //    foreach (var currentMarket in _currentSnapshot.Markets)
+                //    {
+                //        marketTasks.Add(
+                //            GrainFactory.GetGrain<IMarket>($"{eventData.EventKey}|{currentMarket.Key}")
+                //                .Deactivate());
+                //    }
+                //}
+                //else
+                //{
+                //    foreach (var market in eventData.Markets.Values)
+                //    {
+                //        marketTasks.Add(
+                //            GrainFactory.GetGrain<IMarket>($"{eventData.EventKey}|{market.Key}")
+                //                .ChangeOdds(market.Odds.Values.ToArray()));
+                //    }
+                //}
+                //await Task.WhenAll(marketTasks);
 
                 _currentSnapshot = eventData;
             }

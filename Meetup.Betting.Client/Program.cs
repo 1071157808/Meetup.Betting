@@ -17,8 +17,9 @@ namespace Meetup.Betting.Client
     class Program
     {
         private static readonly TelegramBotClient Bot = new TelegramBotClient("357143285:AAEIzDgUL-uabNMuBcCJjIV2LGK2mhU96Wk");
-        
-        private static readonly IEventsFeedStream EventsFeedStream = new EmptyEventsFeedStream();
+
+        private static readonly IEventsFeedStream EventsFeedStream = InnerFeedEventsFeedStream.Create(
+            "uat.redis.betlab.private", "feedhandler:pm");
 
         static void Main(string[] args)
         {

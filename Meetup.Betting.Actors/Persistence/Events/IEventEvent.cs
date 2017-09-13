@@ -28,4 +28,10 @@ namespace Meetup.Betting.Actors.Persistence.Events
         public string TournamentId { get; set; }
         public string[] TeamsIds { get; set; }
     }
+
+    [Serializable]
+    public class InitializedWithId : IEventEvent
+    {
+        public Guid Id { get; set; }
+    }
 }

@@ -31,7 +31,7 @@ namespace Meetup.Betting.Host
             {
                 _siloHost.InitializeOrleansSilo();
 
-                ok = _siloHost.StartOrleansSilo();
+                ok = _siloHost.StartOrleansSilo(false);
 
                 if (ok)
                 {
@@ -142,23 +142,25 @@ namespace Meetup.Betting.Host
             var config = new ClusterConfiguration();
 
             config.StandardLoad();
+
             config.Defaults.Port = siloPort;
             config.Defaults.ProxyGatewayEndpoint = new IPEndPoint(config.Defaults.ProxyGatewayEndpoint.Address,
                 proxyGatewayPort);
 
+            config.UseStartupType<Startup>();
             config.Globals.DeploymentId = "BetLab.Meetup";
             config.Globals.LivenessType = GlobalConfiguration.LivenessProviderType.Custom;
             config.Globals.MembershipTableAssembly = "OrleansConsulUtils";
             config.Globals.ReminderServiceType = GlobalConfiguration.ReminderServiceProviderType.Disabled;
             
-            config.Globals.RegisterBootstrapProvider<Dashboard>("Dashboard", new Dictionary<string, string>()
-            {
-                ["Port"] = "8080"
-            });
-            
-            config.AddStateStorageBasedLogConsistencyProvider();
+            //config.Globals.RegisterBootstrapProvider<Dashboard>("Dashboard", new Dictionary<string, string>()
+            //{
+            //    ["Port"] = "8080"
+            //});
 
-            _siloHost = new SiloHost(siloName, config);
+            config.AddCustomStorageInterfaceBasedLogConsistencyProvider("CustomStorage");
+
+            _siloHost = new SiloHost(Dns.GetHostName(), config);
 
             return true;
         }
